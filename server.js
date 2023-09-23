@@ -8,6 +8,11 @@ const app = express();
 const db = `mysql://root:root@localhost:3306/employeetracker`;
 
 //Express middleware
-app.use(express.urlencoded({ extended: flase }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+
+
+app.listen(PORT, () => {
+    console.log(`Server is running on PORT ${PORT}`);
+})
