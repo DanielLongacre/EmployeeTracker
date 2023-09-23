@@ -1,33 +1,16 @@
-const express = require('express');
-const mysql = require('mysql2');
 const inquirer = require('inquirer');
-// require('console.table');
-
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-//Connect to the database
-// const db = `mysql://root:root@localhost:3306/employeetracker`;
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    database: 'employeetracker',
-    password: 'root'
-});
+const connection = require('./db/connection.js');
+require('console.table');
 
 connection.connect(
     (error) => {
-        if(error) {
+        if (error) {
             console.log(error)
         } else {
             menu();
         }
     }
 )
-
-//Express middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 
 
 const menu = () => {
@@ -42,7 +25,6 @@ const menu = () => {
     .then((answers) => {
         console.log(answers)
         if(answers.choice === 'View All Employees') {
-            console.log()
             viewAllEmployees()
         }
         else if(answers.choice === 'Add Employee') {
@@ -67,12 +49,22 @@ const menu = () => {
             process.exit()
         }     
         
+    })
+    .catch((error) => {
+        if (error.isTtyError) {
+            // Prompt couldn't be rendered in the current environment
+        } else {
+            // Something else went wrong
+        }
     });
 }
 
+// ----------------------------------------------------------------------------------------------------------------------
+//// FUNCTIONS USING SQL
+
 const viewAllEmployees = () => {
     connection.query(
-        `SELECT e.id, e.first_name, e.last_name, r.title, d.name as department, r.salary FROM employee e LEFT JOIN role r on r.id = e.role_id LEFT JOIN department d on d.id = r.department_id`,
+        `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary, manager.first_name AS managerFirstName, manager.last_name AS managerLastName FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON  role.department_id = department.id LEFT JOIN employee AS manager ON manager.id = employee.manager_id`,
         function(err, results) {
             console.log(err);
             console.table(results);
@@ -139,10 +131,3 @@ const viewAllDepartments = () => {
         }
     );
 }
-
-
-app.listen(PORT, () => {
-    console.log(`Server is running on PORT ${PORT}`);
-})
-
-// menu();
