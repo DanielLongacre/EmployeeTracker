@@ -96,7 +96,7 @@ const addEmployee = () => {
             type: "list",
             name: "manager_id",
             message: "Who is the employee's manager",
-            choices: ['None', 'Drake', 'Taylor Swift', 'Kenny Chesney', 'Morgan Wallen', 'Jesus']
+            choices: ['None', 'George', 'Adam', 'Emilia', 'Kalen', 'Richard']
         }
     ])
         .then((answers) => {
@@ -170,7 +170,43 @@ const viewAllRoles = () => {
 
 
 const addRole = () => {
+    connection.query('SELECT * FROM department', function(err, res) {
+        const departmentList = res.map(({ id, name }) => ({
+            name: name,
+            value: id
+        }))
 
+        inquirer.prompt([
+            {
+                type: 'input',
+                name: 'newRole',
+                message: 'Enter the name of the role:'
+            },
+            {
+                type: 'input',
+                name: 'newSalary',
+                message: 'What is the salary?'
+            },
+            {
+                type: 'list',
+                name: 'newDepartmentId',
+                message: 'Choose the department:',
+                choices: departmentList
+            }
+        ])
+        .then((answers) => {
+            console.log(answers)
+            connection.query(
+                `INSERT INTO role(title, salary, deparment_id) VALUES('${answers.newRole}', '${answers.newSalary}', '${answers.newDeparmentId}')`,
+                function(err, results) {
+                    console.log(err);
+                    console.log('New Role has been added!');
+                    menu()
+                }
+            )
+        })
+
+    })
 }
 
 
