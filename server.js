@@ -169,6 +169,11 @@ const viewAllRoles = () => {
 }
 
 
+const addRole = () => {
+
+}
+
+
 const viewAllDepartments = () => {
     connection.query(
         `SELECT * FROM department`,
@@ -178,4 +183,26 @@ const viewAllDepartments = () => {
             menu()
         }
     );
+}
+
+
+const addDepartment = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'departmentName',
+            message: 'Enter the name of the department.'
+        }
+    ])
+    .then((answers) => {
+        console.log(answers)
+        connection.query(
+            `INSERT INTO department(name) VALUES('${answers.departmentName}')`,
+            function(err, results) {
+                console.log(err);
+                console.table(results);
+                menu()
+            }
+        )
+    });
 }
